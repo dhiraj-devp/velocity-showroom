@@ -1,5 +1,7 @@
 import type { ImageRole, Vehicle, VehicleImage } from "@/features/vehicles/types";
 
+export type DemoVehicle = Omit<Vehicle, "frames" | "is360Enabled">;
+
 function images(slug: string, name: string, count: number): VehicleImage[] {
   return Array.from({ length: count }, (_, index) => ({
     id: `${slug}-${index + 1}`,
@@ -11,7 +13,7 @@ function images(slug: string, name: string, count: number): VehicleImage[] {
   }));
 }
 
-export const vehicles: Vehicle[] = [
+export const vehicles: DemoVehicle[] = [
   {
     id: "veh-bmw-m4",
     slug: "bmw-m4-competition",

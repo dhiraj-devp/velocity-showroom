@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { ActiveFilters } from "@/features/vehicles/components/ActiveFilters";
 import { VehicleCategoryNav } from "@/features/vehicles/components/VehicleCategoryNav";
 import { VehicleEmptyState } from "@/features/vehicles/components/VehicleEmptyState";
+import { CompareBar } from "@/features/compare/components/CompareBar";
 import { VehicleFiltersPanel } from "@/features/vehicles/components/VehicleFiltersPanel";
 import { VehicleGrid } from "@/features/vehicles/components/VehicleGrid";
 import { VehicleSearch } from "@/features/vehicles/components/VehicleSearch";
@@ -183,6 +184,7 @@ export function VehicleCollection({
           </div>
         </div>
       ) : null}
+      <CompareBar />
     </div>
   );
 }

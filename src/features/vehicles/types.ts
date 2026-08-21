@@ -40,6 +40,12 @@ export type VehicleImage = {
   role: ImageRole;
 };
 
+export type Vehicle360Frame = {
+  id: string;
+  src: string;
+  sortOrder: number;
+};
+
 export type Vehicle = {
   id: string;
   slug: string;
@@ -57,9 +63,11 @@ export type Vehicle = {
   location?: string;
   description: string;
   images: VehicleImage[];
+  frames: Vehicle360Frame[];
   isFeatured: boolean;
   availability: VehicleAvailability;
   hasGallery: boolean;
+  is360Enabled: boolean;
   has360View: boolean;
   has3DExperience: boolean;
   optional3DModelUrl?: string;
@@ -70,6 +78,29 @@ export type VehicleRecord = {
   brand: Brand;
   model: Model;
   category: Category;
+};
+
+export type VehicleWriteInput = {
+  slug: string;
+  brandId: string;
+  modelId: string;
+  categoryId: string;
+  name: string;
+  year: number;
+  price: number;
+  currency: CurrencyCode;
+  mileageKm?: number;
+  fuelType: FuelType;
+  transmission: Transmission;
+  condition: VehicleCondition;
+  availability: VehicleAvailability;
+  description: string;
+  location?: string;
+  isFeatured: boolean;
+  hasGallery: boolean;
+  has360View: boolean;
+  has3DExperience: boolean;
+  optional3DModelUrl?: string;
 };
 
 export type VehicleCatalog = {

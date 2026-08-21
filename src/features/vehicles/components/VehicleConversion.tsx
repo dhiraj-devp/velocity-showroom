@@ -93,8 +93,12 @@ export function VehicleConversion({
       </div>
 
       <div className="mt-6 hidden items-center gap-x-6 gap-y-3 sm:flex sm:flex-wrap">
-        <WhatsAppAction dealership={dealership} message={whatsappMessage} />
-        <CallAction dealership={dealership} />
+        <WhatsAppAction
+          dealership={dealership}
+          message={whatsappMessage}
+          vehicleId={record.vehicle.id}
+        />
+        <CallAction dealership={dealership} vehicleId={record.vehicle.id} />
         <ShareVehicleAction title={title} text={whatsappMessage} />
       </div>
 
@@ -109,7 +113,7 @@ export function VehicleConversion({
           </button>
         ) : null}
         <ShareVehicleAction title={title} text={whatsappMessage} />
-        <CallAction dealership={dealership} />
+        <CallAction dealership={dealership} vehicleId={record.vehicle.id} />
       </div>
 
       <div className="vehicle-sticky-bar sm:hidden">
@@ -140,6 +144,7 @@ export function VehicleConversion({
             <WhatsAppAction
               dealership={dealership}
               message={whatsappMessage}
+              vehicleId={record.vehicle.id}
               variant="button"
             >
               WhatsApp

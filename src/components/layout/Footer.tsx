@@ -1,10 +1,10 @@
 import { CallAction } from "@/features/dealership/components/CallAction";
 import { WhatsAppAction } from "@/features/dealership/components/WhatsAppAction";
-import { localDealershipRepository } from "@/features/dealership/repository/localDealershipRepository";
+import { dealershipRepository } from "@/features/dealership/repository/dealershipRepository";
 import { navLinks } from "@/constants/navigation";
 
-export function Footer() {
-  const dealership = localDealershipRepository.get();
+export async function Footer() {
+  const dealership = await dealershipRepository.get();
 
   return (
     <footer

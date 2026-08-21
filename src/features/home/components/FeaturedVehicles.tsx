@@ -1,11 +1,13 @@
 import { MagneticButton } from "@/components/common/MagneticButton";
 import { SectionHeading } from "@/components/common/SectionHeading";
 import { formatPrice } from "@/features/vehicles/lib/formatCurrency";
-import { localVehicleRepository } from "@/features/vehicles/repository/localVehicleRepository";
+import { getHeroImage } from "@/features/vehicles/lib/resolveVehicle";
+import { isStoredVehiclePhoto } from "@/features/vehicles/lib/vehicleImages";
+import { vehicleRepository } from "@/features/vehicles/repository/vehicleRepository";
 import type { VehicleRecord } from "@/features/vehicles/types";
 
-export function FeaturedVehicles() {
-  const featured = localVehicleRepository.getFeaturedVehicles();
+export async function FeaturedVehicles() {
+  const featured = await vehicleRepository.getFeaturedVehicles();
 
   return (
     <section
@@ -39,15 +41,25 @@ function FeaturedPanel({
 }) {
   const order = String(index).padStart(2, "0");
   const { vehicle, brand } = record;
+  const hero = getHeroImage(record);
+  const photo = hero && isStoredVehiclePhoto(hero.src) ? hero : undefined;
 
   return (
     <article className="vehicle-panel flex h-full flex-col p-7 sm:p-9">
       <div className="relative mb-10 flex min-h-40 items-end justify-center overflow-hidden bg-surface">
+        {photo ? (
+          // eslint-disable-next-line @next/next/no-img-element -- local /uploads files
+          <img
+            src={photo.src}
+            alt=""
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+        ) : null}
         <div
           aria-hidden="true"
-          className="vehicle-glow pointer-events-none absolute inset-x-8 bottom-4 h-16 rounded-[100%] bg-accent/25 opacity-40 blur-2xl transition-opacity duration-300"
+          className="vehicle-glow pointer-events-none absolute inset-x-8 bottom-4 z-10 h-16 rounded-[100%] bg-accent/25 opacity-40 blur-2xl transition-opacity duration-300"
         />
-        <p className="relative mb-6 px-6 text-center font-display text-3xl tracking-[-0.03em] text-foreground/80">
+        <p className="relative z-10 mb-6 px-6 text-center font-display text-3xl tracking-[-0.03em] text-foreground/80">
           {brand.name}
         </p>
       </div>

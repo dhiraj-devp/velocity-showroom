@@ -1,10 +1,12 @@
 import Link from "next/link";
-import { localDealershipRepository } from "@/features/dealership/repository/localDealershipRepository";
+import { VehicleViewTracker } from "@/features/analytics/components/VehicleViewTracker";
+import type { Dealership } from "@/features/dealership/types";
 import { SimilarVehicles } from "@/features/vehicles/components/SimilarVehicles";
 import { VehicleConversion } from "@/features/vehicles/components/VehicleConversion";
 import { VehicleExperienceCta } from "@/features/vehicles/components/VehicleExperienceCta";
-import { VehicleGallery } from "@/features/vehicles/components/VehicleGallery";
+import { VehicleGalleryWith360 } from "@/features/vehicles/components/VehicleGalleryWith360";
 import { VehicleStatus } from "@/features/vehicles/components/VehicleStatus";
+import { vehicleJsonLd } from "@/features/vehicles/lib/jsonLd";
 import {
   formatCondition,
   formatFuel,
@@ -17,15 +19,21 @@ import type { VehicleRecord } from "@/features/vehicles/types";
 export function VehicleDetail({
   record,
   similar,
+  dealership,
 }: {
   record: VehicleRecord;
   similar: VehicleRecord[];
+  dealership: Dealership;
 }) {
   const { vehicle, brand, model, category } = record;
-  const dealership = localDealershipRepository.get();
 
   return (
     <article className="vehicle-detail px-5 pt-28 pb-24 md:px-10 md:pt-32 md:pb-32 lg:px-14">
+      <VehicleViewTracker vehicleId={vehicle.id} slug={vehicle.slug} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(vehicleJsonLd(record, dealership)) }}
+      />
       <nav aria-label="Breadcrumb" className="text-[0.58rem] tracking-[0.24em] text-muted uppercase">
         <Link href="/cars" className="transition-colors hover:text-foreground">
           Collection
@@ -37,7 +45,7 @@ export function VehicleDetail({
       </nav>
 
       <div className="mt-10 grid gap-10 lg:grid-cols-[minmax(0,1.4fr)_minmax(18rem,0.8fr)] lg:items-start">
-        <VehicleGallery record={record} />
+        <VehicleGalleryWith360 record={record} />
 
         <div>
           <p className="text-[0.62rem] tracking-[0.36em] text-accent uppercase">

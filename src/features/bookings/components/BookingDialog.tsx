@@ -1,7 +1,8 @@
 "use client";
 
 import { useId, useState, type FormEvent, type HTMLAttributes } from "react";
-import { localBookingRepository } from "@/features/bookings/repository/localBookingRepository";
+import { trackProductEvent } from "@/features/analytics/lib/track";
+import { submitBooking } from "@/features/leads/actions";
 import { ConversionDialog } from "@/features/leads/components/ConversionDialog";
 import {
   todayDateInputValue,
@@ -33,6 +34,8 @@ export function BookingDialog({ open, record, onClose }: BookingDialogProps) {
   const [errors, setErrors] = useState<ReturnType<typeof validateBookingFields>>({});
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [persisted, setPersisted] = useState<"mysql" | "local">("local");
+  const [formError, setFormError] = useState<string | null>(null);
   const context = buildEnquiryContext(record);
 
   async function onSubmit(event: FormEvent) {
@@ -45,11 +48,12 @@ export function BookingDialog({ open, record, onClose }: BookingDialogProps) {
       preferredTime,
     });
     setErrors(nextErrors);
+    setFormError(null);
     if (Object.keys(nextErrors).length > 0) return;
 
     setSubmitting(true);
     try {
-      await localBookingRepository.create({
+      const result = await submitBooking({
         vehicleId: context.vehicleId,
         vehicleName: context.vehicleName,
         vehicleSlug: context.vehicleSlug,
@@ -61,7 +65,17 @@ export function BookingDialog({ open, record, onClose }: BookingDialogProps) {
         message,
         type: "viewing",
       });
+      if (!result.ok) {
+        if (result.fieldErrors) setErrors(result.fieldErrors);
+        setFormError(result.error);
+        return;
+      }
+      setPersisted(result.persisted);
       setSuccess(true);
+      trackProductEvent("viewing_requested", {
+        vehicleId: record.vehicle.id,
+        slug: record.vehicle.slug,
+      });
     } finally {
       setSubmitting(false);
     }
@@ -76,8 +90,9 @@ export function BookingDialog({ open, record, onClose }: BookingDialogProps) {
     >
       {success ? (
         <p className="text-sm leading-relaxed text-muted">
-          This viewing request has been recorded in this demonstration. A live
-          scheduling desk is not connected yet.
+          {persisted === "mysql"
+            ? "Your viewing request has been received. The desk will confirm a time."
+            : "This viewing request has been recorded locally for this demonstration. Connect MySQL to persist bookings."}
         </p>
       ) : (
         <form className="flex flex-col gap-5" onSubmit={onSubmit} noValidate>
@@ -151,6 +166,11 @@ export function BookingDialog({ open, record, onClose }: BookingDialogProps) {
               onChange={(event) => setMessage(event.target.value)}
             />
           </label>
+          {formError ? (
+            <p className="text-sm text-accent" role="alert">
+              {formError}
+            </p>
+          ) : null}
           <button type="submit" className="collection-apply" disabled={submitting}>
             {submitting ? "Recording…" : "Request viewing"}
           </button>

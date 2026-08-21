@@ -1,0 +1,55 @@
+{
+  "version": "7",
+  "dialect": "mysql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1787300974604,
+      "tag": "0000_ancient_ulik",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1787302464145,
+      "tag": "0001_boring_james_howlett",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1787304541839,
+      "tag": "0002_glorious_cannonball",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1787306423493,
+      "tag": "0003_perfect_angel",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1787307926353,
+      "tag": "0004_lethal_crystal",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1787308921320,
+      "tag": "0005_mysterious_sentinel",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1787309794359,
+      "tag": "0006_lame_payback",
+      "breakpoints": true
+    }
+  ]
+}

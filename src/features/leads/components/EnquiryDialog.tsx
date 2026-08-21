@@ -2,10 +2,11 @@
 
 import { useId, useState, type FormEvent, type HTMLAttributes } from "react";
 import type { Dealership } from "@/features/dealership/types";
+import { trackProductEvent } from "@/features/analytics/lib/track";
+import { submitEnquiry } from "@/features/leads/actions";
 import { ConversionDialog } from "@/features/leads/components/ConversionDialog";
 import { validateContactFields } from "@/features/leads/lib/validateLead";
-import { localLeadRepository } from "@/features/leads/repository/localLeadRepository";
-import type { LeadSource } from "@/features/leads/types";
+import { readClientUtm } from "@/features/leads/lib/utm";
 import { buildEnquiryContext } from "@/features/vehicles/lib/enquiryContext";
 import type { VehicleRecord } from "@/features/vehicles/types";
 
@@ -21,22 +22,22 @@ type EnquiryDialogProps = {
 
 const COPY: Record<
   EnquiryMode,
-  { eyebrow: string; submit: string; source: LeadSource }
+  { eyebrow: string; submit: string; sourceDetail: EnquiryMode }
 > = {
   vehicle_enquiry: {
     eyebrow: "Enquire about",
     submit: "Send enquiry",
-    source: "vehicle_enquiry",
+    sourceDetail: "vehicle_enquiry",
   },
   register_interest: {
     eyebrow: "Register interest",
     submit: "Register interest",
-    source: "register_interest",
+    sourceDetail: "register_interest",
   },
   similar_enquiry: {
     eyebrow: "Enquire about similar",
     submit: "Send enquiry",
-    source: "vehicle_enquiry",
+    sourceDetail: "similar_enquiry",
   },
 };
 
@@ -59,29 +60,47 @@ export function EnquiryDialog({
   const [errors, setErrors] = useState<ReturnType<typeof validateContactFields>>({});
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [persisted, setPersisted] = useState<"mysql" | "local">("local");
+  const [formError, setFormError] = useState<string | null>(null);
 
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
     const nextErrors = validateContactFields({ name, phone, email });
     setErrors(nextErrors);
+    setFormError(null);
     if (Object.keys(nextErrors).length > 0) return;
 
     setSubmitting(true);
     try {
       const context = buildEnquiryContext(record);
-      await localLeadRepository.create({
+      const utm = readClientUtm(window.location.search);
+      const result = await submitEnquiry({
         dealershipId: dealership.id,
         vehicleId: context.vehicleId,
         vehicleName: context.vehicleName,
         vehicleSlug: context.vehicleSlug,
         pagePath: context.pagePath,
-        source: copy.source,
+        source: "website",
+        sourceDetail: copy.sourceDetail,
+        utmSource: utm.utmSource,
+        utmMedium: utm.utmMedium,
+        utmCampaign: utm.utmCampaign,
         name,
         phone,
         email,
         message,
       });
+      if (!result.ok) {
+        if (result.fieldErrors) setErrors(result.fieldErrors);
+        setFormError(result.error);
+        return;
+      }
+      setPersisted(result.persisted);
       setSuccess(true);
+      trackProductEvent("vehicle_enquiry", {
+        vehicleId: record.vehicle.id,
+        slug: record.vehicle.slug,
+      });
     } finally {
       setSubmitting(false);
     }
@@ -96,8 +115,9 @@ export function EnquiryDialog({
     >
       {success ? (
         <p className="text-sm leading-relaxed text-muted">
-          Your details have been recorded in this demonstration. A live desk and
-          email connection are not active yet.
+          {persisted === "mysql"
+            ? "Your enquiry has been received. A concierge will follow from the private desk."
+            : "Your details have been recorded locally for this demonstration. Connect MySQL to persist enquiries."}
         </p>
       ) : (
         <form className="flex flex-col gap-5" onSubmit={onSubmit} noValidate>
@@ -136,6 +156,11 @@ export function EnquiryDialog({
               onChange={(event) => setMessage(event.target.value)}
             />
           </label>
+          {formError ? (
+            <p className="text-sm text-accent" role="alert">
+              {formError}
+            </p>
+          ) : null}
           <button type="submit" className="collection-apply" disabled={submitting}>
             {submitting ? "Recording…" : copy.submit}
           </button>

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { VehicleCollection } from "@/features/vehicles/components/VehicleCollection";
 import { parseCollectionQuery } from "@/features/vehicles/lib/filterQuery";
-import { localVehicleRepository } from "@/features/vehicles/repository/localVehicleRepository";
+import { vehicleRepository } from "@/features/vehicles/repository/vehicleRepository";
 
 export const metadata: Metadata = {
   title: "Collection | VELOCITY",
@@ -13,7 +13,7 @@ type CarsPageProps = {
 };
 
 export default async function CarsPage({ searchParams }: CarsPageProps) {
-  const catalog = localVehicleRepository.getCatalog();
+  const catalog = await vehicleRepository.getCatalog();
   const params = await searchParams;
   const { filters, sort } = parseCollectionQuery(params, catalog);
 

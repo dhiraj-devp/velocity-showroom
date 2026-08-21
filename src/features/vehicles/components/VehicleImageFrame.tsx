@@ -1,4 +1,5 @@
 import type { VehicleImage } from "@/features/vehicles/types";
+import { isStoredVehiclePhoto } from "@/features/vehicles/lib/vehicleImages";
 import { cn } from "@/lib/cn";
 
 const TONES: Record<string, string> = {
@@ -25,14 +26,27 @@ export function VehicleImageFrame({
   brandName,
   vehicleName,
   className,
+  priority,
 }: VehicleImageFrameProps) {
   const tone = TONES[brandId] ?? "#161618";
+  const photo = image && isStoredVehiclePhoto(image.src) ? image : undefined;
 
   return (
     <div
       className={cn("vehicle-media relative overflow-hidden bg-surface", className)}
       style={{ backgroundColor: tone }}
     >
+      {photo ? (
+        // eslint-disable-next-line @next/next/no-img-element -- local /uploads files, not remote next/image hosts
+        <img
+          src={photo.src}
+          alt=""
+          width={photo.width}
+          height={photo.height}
+          className="absolute inset-0 h-full w-full object-cover"
+          fetchPriority={priority ? "high" : undefined}
+        />
+      ) : null}
       <div
         aria-hidden="true"
         className="absolute inset-0 opacity-80"

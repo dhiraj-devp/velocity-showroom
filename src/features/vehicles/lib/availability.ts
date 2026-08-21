@@ -5,7 +5,7 @@ export function availabilityLabel(status: VehicleAvailability): string {
     case "reserved":
       return "Reserved";
     case "sold":
-      return "Placed";
+      return "Sold";
     case "coming_soon":
       return "Arriving";
     default:

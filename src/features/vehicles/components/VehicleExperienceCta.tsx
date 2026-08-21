@@ -14,11 +14,14 @@ export function VehicleExperienceCta({ record }: { record: VehicleRecord }) {
             360° view
           </p>
           <p className="mt-3 text-sm leading-relaxed text-muted">
-            A spin sequence will appear here when photography is complete.
+            Drag around the machine. Photography, not a 3D model.
           </p>
-          <p className="mt-5 text-[0.62rem] tracking-[0.24em] text-muted uppercase">
-            Viewer reserved
-          </p>
+          <a
+            href="#view-360"
+            className="mt-5 inline-flex min-h-11 items-center text-[0.62rem] tracking-[0.28em] text-accent uppercase"
+          >
+            Open 360° view →
+          </a>
         </div>
       ) : null}
       {vehicle.has3DExperience ? (

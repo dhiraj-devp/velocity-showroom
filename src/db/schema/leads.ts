@@ -1,0 +1,77 @@
+import {
+  index,
+  int,
+  mysqlEnum,
+  mysqlTable,
+  text,
+  timestamp,
+  varchar,
+} from "drizzle-orm/mysql-core";
+import { vehicles } from "./vehicles";
+
+export const leads = mysqlTable(
+  "leads",
+  {
+    id: varchar("id", { length: 64 }).primaryKey(),
+    vehicleId: varchar("vehicle_id", { length: 64 }).references(() => vehicles.id),
+    name: varchar("name", { length: 160 }),
+    phone: varchar("phone", { length: 32 }),
+    visitorKey: varchar("visitor_key", { length: 64 }),
+    email: varchar("email", { length: 160 }),
+    message: text("message"),
+    source: mysqlEnum("source", [
+      "website",
+      "whatsapp",
+      "phone",
+      "instagram",
+      "facebook",
+      "google",
+      "referral",
+      "direct",
+      "other",
+    ]).notNull(),
+    sourceDetail: varchar("source_detail", { length: 64 }),
+    utmSource: varchar("utm_source", { length: 120 }),
+    utmMedium: varchar("utm_medium", { length: 120 }),
+    utmCampaign: varchar("utm_campaign", { length: 120 }),
+    pagePath: varchar("page_path", { length: 255 }),
+    status: mysqlEnum("status", [
+      "new",
+      "contacted",
+      "qualified",
+      "won",
+      "lost",
+    ])
+      .notNull()
+      .default("new"),
+    nextFollowUpAt: timestamp("next_follow_up_at"),
+    lastContactedAt: timestamp("last_contacted_at"),
+    expectedDealValue: int("expected_deal_value", { unsigned: true }),
+    finalSaleValue: int("final_sale_value", { unsigned: true }),
+    lostReason: mysqlEnum("lost_reason", [
+      "price_too_high",
+      "vehicle_sold_elsewhere",
+      "no_response",
+      "budget_issue",
+      "not_interested",
+      "purchased_elsewhere",
+      "other",
+    ]),
+    lostReasonDetail: varchar("lost_reason_detail", { length: 160 }),
+    // Future team desk: these store admin email now and can remap to user ids later.
+    assignedTo: varchar("assigned_to", { length: 160 }),
+    createdBy: varchar("created_by", { length: 160 }),
+    updatedBy: varchar("updated_by", { length: 160 }),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at").notNull().defaultNow().onUpdateNow(),
+  },
+  (table) => [
+    index("leads_status_idx").on(table.status),
+    index("leads_vehicle_idx").on(table.vehicleId),
+    index("leads_created_idx").on(table.createdAt),
+    index("leads_source_idx").on(table.source),
+    index("leads_follow_up_idx").on(table.nextFollowUpAt),
+    index("leads_visitor_idx").on(table.visitorKey),
+    index("leads_assigned_idx").on(table.assignedTo),
+  ],
+);
