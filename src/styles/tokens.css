@@ -1,0 +1,25 @@
+:root {
+  --background: #050506;
+  --surface: #0c0c0e;
+  --surface-elevated: #121214;
+  --foreground: #f3efe6;
+  --muted: #8e887c;
+  --accent: #c6a56a;
+  --accent-strong: #e0c48a;
+  --border: rgba(243, 239, 230, 0.1);
+  --border-accent: rgba(198, 165, 106, 0.38);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-elevated: var(--surface-elevated);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-border: var(--border);
+  --color-border-accent: var(--border-accent);
+  --font-sans: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-syne), ui-sans-serif, system-ui, sans-serif;
+}
