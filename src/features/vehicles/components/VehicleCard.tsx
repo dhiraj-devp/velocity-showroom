@@ -9,7 +9,13 @@ import {
 import { getHeroImage } from "@/features/vehicles/lib/resolveVehicle";
 import type { VehicleRecord } from "@/features/vehicles/types";
 
-export function VehicleCard({ record }: { record: VehicleRecord }) {
+export function VehicleCard({
+  record,
+  alwaysShowAvailability = false,
+}: {
+  record: VehicleRecord;
+  alwaysShowAvailability?: boolean;
+}) {
   const { vehicle, brand } = record;
   const hero = getHeroImage(record);
 
@@ -28,7 +34,10 @@ export function VehicleCard({ record }: { record: VehicleRecord }) {
           <p className="text-[0.58rem] tracking-[0.32em] text-accent uppercase">
             {brand.name}
           </p>
-          <VehicleStatus status={vehicle.availability} />
+          <VehicleStatus
+            status={vehicle.availability}
+            alwaysShow={alwaysShowAvailability}
+          />
           <h3 className="font-display mt-2 text-2xl tracking-[-0.03em]">
             {vehicle.name}
           </h3>

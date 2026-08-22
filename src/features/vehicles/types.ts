@@ -71,6 +71,7 @@ export type Vehicle = {
   has360View: boolean;
   has3DExperience: boolean;
   optional3DModelUrl?: string;
+  createdAt: string;
 };
 
 export type VehicleRecord = {
@@ -122,6 +123,20 @@ export type VehicleFilters = {
   fuelType: FuelType | null;
   transmission: Transmission | null;
   condition: VehicleCondition | null;
+  availability: VehicleAvailability | null;
+};
+
+export type HomepageCategory = {
+  id: string;
+  name: string;
+  slug: string;
+  vehicleCount: number;
+};
+
+export type VehicleSearchOptions = {
+  brands: Brand[];
+  models: Model[];
+  categories: Category[];
 };
 
 export type PricePresetId =

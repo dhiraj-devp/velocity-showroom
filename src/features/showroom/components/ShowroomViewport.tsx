@@ -10,6 +10,7 @@ import {
 } from "react";
 import { useReducedMotion } from "@/features/showroom/hooks/useReducedMotion";
 import { useVehicleExploration } from "@/features/showroom/hooks/useVehicleExploration";
+import { setShowroomScrollProgress } from "@/features/showroom/lib/scrollProgress";
 
 const ShowroomRevealContext = createContext(true);
 
@@ -44,6 +45,45 @@ export function ShowroomViewport({ children }: ShowroomViewportProps) {
 
     observer.observe(target);
     return () => observer.disconnect();
+  }, [reducedMotion]);
+
+  useEffect(() => {
+    const target = node.current;
+    if (!target) return;
+
+    let frame = 0;
+    const stage = target;
+    const mobileQuery = window.matchMedia("(max-width: 639px)");
+
+    function update() {
+      frame = 0;
+      if (reducedMotion || mobileQuery.matches) {
+        setShowroomScrollProgress(0);
+        return;
+      }
+
+      const rect = stage.getBoundingClientRect();
+      const vh = window.innerHeight;
+      const start = vh * 0.92;
+      const end = -rect.height * 0.35;
+      const t = (start - rect.top) / (start - end);
+      setShowroomScrollProgress(t < 0 ? 0 : t > 1 ? 1 : t);
+    }
+
+    function onScroll() {
+      if (frame) return;
+      frame = requestAnimationFrame(update);
+    }
+
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    mobileQuery.addEventListener("change", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      mobileQuery.removeEventListener("change", onScroll);
+      if (frame) cancelAnimationFrame(frame);
+      setShowroomScrollProgress(0);
+    };
   }, [reducedMotion]);
 
   const live = reducedMotion || revealed;

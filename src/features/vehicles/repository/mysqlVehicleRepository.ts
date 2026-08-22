@@ -1,4 +1,4 @@
-import { and, count, eq, ne } from "drizzle-orm";
+import { and, asc, count, desc, eq, inArray, ne } from "drizzle-orm";
 import { getDb } from "@/db";
 import { mapBrand, mapCategory, mapModel, mapVehicle } from "@/db/mapToDomain";
 import { brands } from "@/db/schema/brands";
@@ -12,6 +12,7 @@ import { vehicleModels } from "@/db/schema/vehicle-models";
 import { vehicleReservations } from "@/db/schema/vehicle-reservations";
 import { vehicles } from "@/db/schema/vehicles";
 import { isFeaturedEligible } from "@/features/vehicles/lib/availability";
+import { LATEST_ARRIVAL_LIMIT } from "@/features/vehicles/lib/homepageCatalog";
 import { resolveVehicle } from "@/features/vehicles/lib/resolveVehicle";
 import { findSimilarVehicles } from "@/features/vehicles/lib/similarVehicles";
 import { MIN_360_FRAMES } from "@/features/vehicles/lib/spin";
@@ -21,10 +22,12 @@ import {
   preferStoredVehicleImages,
 } from "@/features/vehicles/lib/vehicleImages";
 import type {
+  HomepageCategory,
   Model,
   VehicleAvailability,
   VehicleCatalog,
   VehicleRecord,
+  VehicleSearchOptions,
   VehicleWriteInput,
 } from "@/features/vehicles/types";
 
@@ -46,6 +49,61 @@ function groupFrames(rows: (typeof vehicle360Frames.$inferSelect)[]) {
     grouped.set(row.vehicleId, list);
   }
   return grouped;
+}
+
+async function recordsForVehicleRows(
+  vehicleRows: (typeof vehicles.$inferSelect)[],
+): Promise<VehicleRecord[]> {
+  if (vehicleRows.length === 0) return [];
+
+  const db = getDb();
+  const ids = vehicleRows.map((row) => row.id);
+  const brandIds = [...new Set(vehicleRows.map((row) => row.brandId))];
+  const modelIds = [
+    ...new Set(
+      vehicleRows
+        .map((row) => row.modelId)
+        .filter((id): id is string => Boolean(id)),
+    ),
+  ];
+  const categoryIds = [...new Set(vehicleRows.map((row) => row.categoryId))];
+
+  const [imageRows, frameRows, brandRows, modelRows, categoryRows] =
+    await Promise.all([
+      db.select().from(vehicleImages).where(inArray(vehicleImages.vehicleId, ids)),
+      db
+        .select()
+        .from(vehicle360Frames)
+        .where(inArray(vehicle360Frames.vehicleId, ids)),
+      db.select().from(brands).where(inArray(brands.id, brandIds)),
+      modelIds.length > 0
+        ? db.select().from(vehicleModels).where(inArray(vehicleModels.id, modelIds))
+        : Promise.resolve([]),
+      db.select().from(categories).where(inArray(categories.id, categoryIds)),
+    ]);
+
+  const imagesByVehicle = groupImages(imageRows);
+  const framesByVehicle = groupFrames(frameRows);
+  const catalog: VehicleCatalog = {
+    brands: brandRows.map(mapBrand),
+    models: modelRows.map(mapModel),
+    categories: categoryRows.map(mapCategory),
+    vehicles: vehicleRows.map((row) =>
+      mapVehicle(
+        row,
+        imagesByVehicle.get(row.id) ?? [],
+        framesByVehicle.get(row.id) ?? [],
+      ),
+    ),
+  };
+
+  const order = new Map(vehicleRows.map((row, index) => [row.id, index]));
+  return catalog.vehicles
+    .map((vehicle) => resolveVehicle(vehicle, catalog))
+    .filter((record): record is VehicleRecord => record !== null)
+    .sort(
+      (a, b) => (order.get(a.vehicle.id) ?? 0) - (order.get(b.vehicle.id) ?? 0),
+    );
 }
 
 function toRow(
@@ -133,6 +191,102 @@ export const mysqlVehicleRepository = {
       )
       .map((vehicle) => resolveVehicle(vehicle, catalog))
       .filter((record): record is VehicleRecord => record !== null);
+  },
+
+  async getLatestVehicles(limit = LATEST_ARRIVAL_LIMIT): Promise<VehicleRecord[]> {
+    const db = getDb();
+    const rows = await db
+      .select()
+      .from(vehicles)
+      .where(ne(vehicles.availability, "sold"))
+      .orderBy(desc(vehicles.createdAt))
+      .limit(limit);
+    return recordsForVehicleRows(rows);
+  },
+
+  async getHomepageCategories(): Promise<HomepageCategory[]> {
+    const db = getDb();
+    const [categoryRows, countRows] = await Promise.all([
+      db
+        .select()
+        .from(categories)
+        .where(eq(categories.isActive, true))
+        .orderBy(asc(categories.sortOrder), asc(categories.name)),
+      db
+        .select({
+          categoryId: vehicles.categoryId,
+          n: count(),
+        })
+        .from(vehicles)
+        .groupBy(vehicles.categoryId),
+    ]);
+
+    const counts = new Map(
+      countRows.map((row) => [row.categoryId, Number(row.n)]),
+    );
+
+    return categoryRows
+      .map((row) => ({
+        id: row.id,
+        name: row.name,
+        slug: row.slug,
+        vehicleCount: counts.get(row.id) ?? 0,
+      }))
+      .filter((category) => category.vehicleCount > 0);
+  },
+
+  async getVehicleSearchOptions(): Promise<VehicleSearchOptions> {
+    const db = getDb();
+    const [brandRows, modelRows, categoryRows] = await Promise.all([
+      db
+        .select()
+        .from(brands)
+        .where(eq(brands.isActive, true))
+        .orderBy(asc(brands.sortOrder), asc(brands.name)),
+      db
+        .select()
+        .from(vehicleModels)
+        .where(eq(vehicleModels.isActive, true))
+        .orderBy(asc(vehicleModels.sortOrder), asc(vehicleModels.name)),
+      db
+        .select()
+        .from(categories)
+        .where(eq(categories.isActive, true))
+        .orderBy(asc(categories.sortOrder), asc(categories.name)),
+    ]);
+
+    return {
+      brands: brandRows.map(mapBrand),
+      models: modelRows.map(mapModel),
+      categories: categoryRows.map(mapCategory),
+    };
+  },
+
+  async get360ShowcaseVehicle(): Promise<VehicleRecord | null> {
+    const db = getDb();
+    const frameCounts = await db
+      .select({
+        vehicleId: vehicle360Frames.vehicleId,
+        n: count(),
+      })
+      .from(vehicle360Frames)
+      .groupBy(vehicle360Frames.vehicleId);
+
+    const readyIds = frameCounts
+      .filter((row) => Number(row.n) >= MIN_360_FRAMES)
+      .map((row) => row.vehicleId);
+
+    if (readyIds.length === 0) return null;
+
+    const rows = await db
+      .select()
+      .from(vehicles)
+      .where(and(eq(vehicles.has360View, true), inArray(vehicles.id, readyIds)))
+      .orderBy(desc(vehicles.createdAt))
+      .limit(1);
+
+    const [record] = await recordsForVehicleRows(rows);
+    return record && record.vehicle.has360View ? record : null;
   },
 
   async getSimilarVehicles(

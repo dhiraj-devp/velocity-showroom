@@ -132,6 +132,7 @@ export function mapVehicle(
     has360View: is360ExperienceReady(is360Enabled, mappedFrames.length),
     has3DExperience: Boolean(row.has3DExperience),
     optional3DModelUrl: row.model3dUrl ?? undefined,
+    createdAt: row.createdAt.toISOString(),
   };
 }
 

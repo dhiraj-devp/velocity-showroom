@@ -1,9 +1,11 @@
 import { PRICE_PRESETS } from "@/features/vehicles/lib/pricePresets";
+import { availabilityLabel } from "@/features/vehicles/lib/availability";
 import type {
   Brand,
   FuelType,
   Model,
   Transmission,
+  VehicleAvailability,
   VehicleCondition,
   VehicleFilters,
 } from "@/features/vehicles/types";
@@ -19,6 +21,12 @@ type VehicleFiltersPanelProps = {
 const FUELS: FuelType[] = ["petrol", "diesel", "electric", "hybrid"];
 const GEARS: Transmission[] = ["automatic", "manual"];
 const CONDITIONS: VehicleCondition[] = ["new", "used"];
+const AVAILABILITIES: VehicleAvailability[] = [
+  "available",
+  "reserved",
+  "sold",
+  "coming_soon",
+];
 
 export function VehicleFiltersPanel({
   filters,
@@ -241,6 +249,27 @@ export function VehicleFiltersPanel({
           {CONDITIONS.map((condition) => (
             <option key={condition} value={condition}>
               {label(condition)}
+            </option>
+          ))}
+        </select>
+      </label>
+
+      <label className="collection-field">
+        <span className="collection-label">Availability</span>
+        <select
+          className="collection-select"
+          value={filters.availability ?? ""}
+          onChange={(event) =>
+            onChange({
+              ...filters,
+              availability: (event.target.value as VehicleAvailability) || null,
+            })
+          }
+        >
+          <option value="">Any</option>
+          {AVAILABILITIES.map((status) => (
+            <option key={status} value={status}>
+              {availabilityLabel(status)}
             </option>
           ))}
         </select>

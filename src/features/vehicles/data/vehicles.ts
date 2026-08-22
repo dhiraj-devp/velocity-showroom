@@ -1,6 +1,6 @@
 import type { ImageRole, Vehicle, VehicleImage } from "@/features/vehicles/types";
 
-export type DemoVehicle = Omit<Vehicle, "frames" | "is360Enabled">;
+export type DemoVehicle = Omit<Vehicle, "frames" | "is360Enabled" | "createdAt">;
 
 function images(slug: string, name: string, count: number): VehicleImage[] {
   return Array.from({ length: count }, (_, index) => ({

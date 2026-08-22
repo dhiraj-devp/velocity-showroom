@@ -1,8 +1,10 @@
+import { PRICE_PRESETS } from "@/features/vehicles/lib/pricePresets";
 import { createDefaultFilters, DEFAULT_SORT } from "@/features/vehicles/lib/filterState";
 import type {
   FuelType,
   SortOption,
   Transmission,
+  VehicleAvailability,
   VehicleCatalog,
   VehicleCondition,
   VehicleFilters,
@@ -30,6 +32,12 @@ function readNumber(value: SearchValue) {
 const FUEL: FuelType[] = ["petrol", "diesel", "electric", "hybrid"];
 const GEAR: Transmission[] = ["automatic", "manual"];
 const CONDITION: VehicleCondition[] = ["new", "used"];
+const AVAILABILITY: VehicleAvailability[] = [
+  "available",
+  "reserved",
+  "sold",
+  "coming_soon",
+];
 const SORT: SortOption[] = [
   "featured",
   "price-asc",
@@ -61,8 +69,16 @@ export function parseCollectionQuery(
   const category = catalog.categories.find((item) => item.slug === categorySlug);
   if (category) filters.categoryId = category.id;
 
-  filters.minPrice = readNumber(params.minPrice);
-  filters.maxPrice = readNumber(params.maxPrice);
+  const pricePreset = PRICE_PRESETS.find(
+    (item) => item.id === readParam(params.price),
+  );
+  if (pricePreset && pricePreset.id !== "any") {
+    filters.minPrice = pricePreset.min;
+    filters.maxPrice = pricePreset.max;
+  }
+
+  filters.minPrice = readNumber(params.minPrice) ?? filters.minPrice;
+  filters.maxPrice = readNumber(params.maxPrice) ?? filters.maxPrice;
   filters.yearMin = readNumber(params.yearMin);
   filters.yearMax = readNumber(params.yearMax);
 
@@ -77,6 +93,11 @@ export function parseCollectionQuery(
   const condition = readParam(params.condition);
   if (CONDITION.includes(condition as VehicleCondition)) {
     filters.condition = condition as VehicleCondition;
+  }
+
+  const availability = readParam(params.availability);
+  if (AVAILABILITY.includes(availability as VehicleAvailability)) {
+    filters.availability = availability as VehicleAvailability;
   }
 
   const sortRaw = readParam(params.sort);
@@ -112,6 +133,7 @@ export function serializeCollectionQuery(
   if (filters.fuelType) params.set("fuel", filters.fuelType);
   if (filters.transmission) params.set("transmission", filters.transmission);
   if (filters.condition) params.set("condition", filters.condition);
+  if (filters.availability) params.set("availability", filters.availability);
   if (sort !== DEFAULT_SORT) params.set("sort", sort);
 
   return params.toString();

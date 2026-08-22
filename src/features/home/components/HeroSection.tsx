@@ -23,7 +23,7 @@ export function HeroSection() {
         className="halo pointer-events-none absolute bottom-[12%] left-1/2 h-40 w-[min(70%,40rem)] -translate-x-1/2 rounded-[100%] bg-accent/20 blur-3xl"
       />
 
-      <div className="relative z-10 mx-auto flex w-full max-w-[92rem] flex-col justify-end px-5 pt-32 pb-16 md:px-10 md:pb-20 lg:px-14 lg:pb-24">
+      <div className="hero-copy relative z-10 mx-auto flex w-full max-w-[92rem] flex-col justify-end px-5 pt-32 pb-16 md:px-10 md:pb-20 lg:px-14 lg:pb-24">
         <p className="mb-8 text-[0.7rem] tracking-[0.42em] text-accent uppercase">
           Atelier · Collection 01
         </p>

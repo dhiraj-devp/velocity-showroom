@@ -4,7 +4,7 @@ export function CtaSection() {
   return (
     <section
       aria-labelledby="cta-heading"
-      className="relative isolate overflow-hidden border-t border-border px-5 py-28 md:px-10 md:py-36 lg:px-14 lg:py-44"
+      className="home-reveal relative isolate overflow-hidden border-t border-border px-5 py-28 md:px-10 md:py-36 lg:px-14 lg:py-44"
     >
       <div
         aria-hidden="true"
@@ -18,14 +18,17 @@ export function CtaSection() {
       <div className="relative mx-auto flex max-w-5xl flex-col items-center text-center">
         <h2
           id="cta-heading"
-          className="font-display text-[clamp(2.6rem,8vw,6.5rem)] leading-[0.9] font-semibold tracking-[-0.04em] text-balance"
+          className="font-display text-[clamp(2.4rem,7vw,5.8rem)] leading-[0.9] font-semibold tracking-[-0.04em] text-balance"
         >
-          YOUR NEXT DRIVE
+          FIND YOUR NEXT
           <br />
-          STARTS HERE.
+          EXTRAORDINARY VEHICLE
         </h2>
-        <div className="mt-12">
-          <MagneticButton href="/#showroom">Explore the Showroom</MagneticButton>
+        <div className="mt-12 flex flex-col gap-3 sm:flex-row sm:items-center">
+          <MagneticButton href="/cars">Explore Collection</MagneticButton>
+          <MagneticButton href="/#about" variant="secondary">
+            Contact Us
+          </MagneticButton>
         </div>
       </div>
     </section>

@@ -23,6 +23,7 @@ export function createDefaultFilters(): VehicleFilters {
     fuelType: null,
     transmission: null,
     condition: null,
+    availability: null,
   };
 }
 
@@ -38,6 +39,7 @@ export function hasActiveFilters(filters: VehicleFilters): boolean {
     filters.yearMax !== null ||
     filters.fuelType !== null ||
     filters.transmission !== null ||
-    filters.condition !== null
+    filters.condition !== null ||
+    filters.availability !== null
   );
 }

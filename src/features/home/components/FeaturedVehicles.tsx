@@ -13,7 +13,7 @@ export async function FeaturedVehicles() {
     <section
       id="vehicles"
       aria-labelledby="vehicles-heading"
-      className="border-b border-border px-5 pt-10 pb-24 md:px-10 md:pt-12 md:pb-32 lg:px-14 lg:pt-14 lg:pb-40"
+      className="home-reveal border-b border-border px-5 pt-10 pb-24 md:px-10 md:pt-12 md:pb-32 lg:px-14 lg:pt-14 lg:pb-40"
     >
       <SectionHeading
         eyebrow="The Collection"

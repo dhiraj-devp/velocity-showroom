@@ -63,6 +63,41 @@ body {
   animation: beam-pulse 7s ease-in-out infinite;
 }
 
+.home-search {
+  display: grid;
+  gap: 1rem;
+}
+
+.home-search-submit {
+  align-self: end;
+}
+
+@media (min-width: 768px) {
+  .home-search {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: end;
+  }
+}
+
+@media (min-width: 1024px) {
+  .home-search {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
+  }
+}
+
+.category-tile {
+  background:
+    linear-gradient(180deg, rgba(198, 165, 106, 0.08), transparent 42%),
+    var(--surface);
+  transition: background-color 0.25s ease;
+}
+
+.category-tile:hover {
+  background:
+    linear-gradient(180deg, rgba(198, 165, 106, 0.14), transparent 48%),
+    var(--surface);
+}
+
 .showroom-stage,
 .showroom-viewport {
   background:
@@ -582,6 +617,40 @@ html[data-entry-active="1"] header {
   }
 }
 
+@keyframes hero-recede {
+  to {
+    transform: translate3d(0, -8vh, 0);
+    opacity: 0.28;
+  }
+}
+
+@keyframes home-rise {
+  from {
+    opacity: 0.4;
+    transform: translate3d(0, 1.75rem, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) and (min-width: 640px) {
+    .hero-copy {
+      animation: hero-recede linear both;
+      animation-timeline: view();
+      animation-range: exit 0% exit 85%;
+    }
+
+    .home-reveal {
+      animation: home-rise linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 22%;
+    }
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -589,7 +658,9 @@ html[data-entry-active="1"] header {
 
   .hero-grid,
   .hero-beam,
-  .halo {
+  .halo,
+  .hero-copy,
+  .home-reveal {
     animation: none;
   }
 

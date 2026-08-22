@@ -15,6 +15,7 @@ import {
 } from "@/features/showroom/config";
 import { useShowroomMaterials } from "@/features/showroom/hooks/useShowroomMaterials";
 import { useVehicleExploration } from "@/features/showroom/hooks/useVehicleExploration";
+import { getShowroomScrollProgress } from "@/features/showroom/lib/scrollProgress";
 
 type ShowroomSceneProps = {
   reducedMotion: boolean;
@@ -70,16 +71,22 @@ function HeroTurntable({
   children: ReactNode;
 }) {
   const group = useRef<Group>(null);
+  const autoYaw = useRef(0);
+  const scrollYaw = useRef(0);
 
   useFrame((_, delta) => {
     if (!group.current) return;
 
     if (reducedMotion) {
+      autoYaw.current = 0;
+      scrollYaw.current = 0;
       group.current.rotation.y = 0;
       return;
     }
 
     if (exploring) {
+      autoYaw.current = 0;
+      scrollYaw.current = 0;
       const tau = Math.PI * 2;
       let yaw = group.current.rotation.y % tau;
       if (yaw > Math.PI) yaw -= tau;
@@ -93,7 +100,11 @@ function HeroTurntable({
       return;
     }
 
-    group.current.rotation.y += delta * 0.035;
+    const progress = getShowroomScrollProgress();
+    autoYaw.current += delta * 0.035 * (1 - progress * 0.72);
+    const yawGoal = progress * 0.32;
+    scrollYaw.current += (yawGoal - scrollYaw.current) * Math.min(1, delta * 2.4);
+    group.current.rotation.y = autoYaw.current + scrollYaw.current;
   });
 
   return (

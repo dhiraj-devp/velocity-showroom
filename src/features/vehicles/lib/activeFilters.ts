@@ -1,3 +1,4 @@
+import { availabilityLabel } from "@/features/vehicles/lib/availability";
 import { formatPrice } from "@/features/vehicles/lib/formatCurrency";
 import { matchPricePreset } from "@/features/vehicles/lib/pricePresets";
 import type { VehicleCatalog, VehicleFilters } from "@/features/vehicles/types";
@@ -53,6 +54,12 @@ export function getActiveFilterChips(
   if (filters.condition) {
     chips.push({ id: "condition", label: title(filters.condition) });
   }
+  if (filters.availability) {
+    chips.push({
+      id: "availability",
+      label: availabilityLabel(filters.availability),
+    });
+  }
 
   return chips;
 }
@@ -80,6 +87,8 @@ export function clearFilterField(
       return { ...filters, transmission: null };
     case "condition":
       return { ...filters, condition: null };
+    case "availability":
+      return { ...filters, availability: null };
     default:
       return filters;
   }

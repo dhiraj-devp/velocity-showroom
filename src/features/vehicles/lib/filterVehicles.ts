@@ -31,6 +31,9 @@ export function filterVehicles(
       return false;
     }
     if (filters.condition && vehicle.condition !== filters.condition) return false;
+    if (filters.availability && vehicle.availability !== filters.availability) {
+      return false;
+    }
 
     return true;
   });

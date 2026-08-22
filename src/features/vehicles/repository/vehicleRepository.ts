@@ -1,21 +1,27 @@
 import { isDatabaseConfigured } from "@/db";
+import { cache } from "react";
 import { localVehicleRepository } from "@/features/vehicles/repository/localVehicleRepository";
 import { mysqlVehicleRepository } from "@/features/vehicles/repository/mysqlVehicleRepository";
+import { LATEST_ARRIVAL_LIMIT } from "@/features/vehicles/lib/homepageCatalog";
 import type {
+  HomepageCategory,
   Model,
   VehicleAvailability,
   VehicleCatalog,
   VehicleRecord,
+  VehicleSearchOptions,
   VehicleWriteInput,
 } from "@/features/vehicles/types";
 
+const loadCatalog = cache(async (): Promise<VehicleCatalog> => {
+  if (isDatabaseConfigured()) {
+    return mysqlVehicleRepository.getCatalog();
+  }
+  return localVehicleRepository.getCatalog();
+});
+
 export const vehicleRepository = {
-  async getCatalog(): Promise<VehicleCatalog> {
-    if (isDatabaseConfigured()) {
-      return mysqlVehicleRepository.getCatalog();
-    }
-    return localVehicleRepository.getCatalog();
-  },
+  getCatalog: loadCatalog,
 
   async getVehicleBySlug(slug: string): Promise<VehicleRecord | null> {
     if (isDatabaseConfigured()) {
@@ -29,6 +35,36 @@ export const vehicleRepository = {
       return mysqlVehicleRepository.getFeaturedVehicles();
     }
     return localVehicleRepository.getFeaturedVehicles();
+  },
+
+  async getLatestVehicles(
+    limit = LATEST_ARRIVAL_LIMIT,
+  ): Promise<VehicleRecord[]> {
+    if (isDatabaseConfigured()) {
+      return mysqlVehicleRepository.getLatestVehicles(limit);
+    }
+    return localVehicleRepository.getLatestVehicles(limit);
+  },
+
+  async getHomepageCategories(): Promise<HomepageCategory[]> {
+    if (isDatabaseConfigured()) {
+      return mysqlVehicleRepository.getHomepageCategories();
+    }
+    return localVehicleRepository.getHomepageCategories();
+  },
+
+  async getVehicleSearchOptions(): Promise<VehicleSearchOptions> {
+    if (isDatabaseConfigured()) {
+      return mysqlVehicleRepository.getVehicleSearchOptions();
+    }
+    return localVehicleRepository.getVehicleSearchOptions();
+  },
+
+  async get360ShowcaseVehicle(): Promise<VehicleRecord | null> {
+    if (isDatabaseConfigured()) {
+      return mysqlVehicleRepository.get360ShowcaseVehicle();
+    }
+    return localVehicleRepository.get360ShowcaseVehicle();
   },
 
   async getSimilarVehicles(

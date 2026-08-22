@@ -31,16 +31,18 @@ export function ShowroomPreview() {
 
 function CollectionBridge() {
   return (
-    <div className="px-5 pt-14 pb-6 md:px-10 md:pt-20 md:pb-8 lg:px-14">
+    <div className="home-reveal px-5 pt-16 pb-8 md:px-10 md:pt-24 md:pb-10 lg:px-14">
       <p className="text-[0.65rem] tracking-[0.38em] text-accent uppercase">
         From the floor
       </p>
-      <div className="mt-6 flex flex-col gap-4 border-t border-border pt-8 sm:flex-row sm:items-end sm:justify-between">
-        <p className="font-display text-2xl tracking-[-0.03em] text-muted sm:text-3xl lg:text-4xl">
-          Explore the environment.
+      <div className="mt-6 flex flex-col gap-6 border-t border-border pt-10 sm:flex-row sm:items-end sm:justify-between">
+        <p className="font-display max-w-xl text-3xl tracking-[-0.03em] sm:text-4xl lg:text-5xl">
+          Presence first.
+          <span className="mt-3 block text-muted">Then the collection.</span>
         </p>
-        <p className="font-display text-2xl tracking-[-0.03em] sm:text-right sm:text-3xl lg:text-4xl">
-          Explore the collection.
+        <p className="max-w-sm text-sm leading-relaxed text-muted sm:text-right">
+          A private list of motor cars, composed for those who expect more than
+          a catalogue.
         </p>
       </div>
     </div>
