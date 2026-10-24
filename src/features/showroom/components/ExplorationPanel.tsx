@@ -10,7 +10,6 @@ type ExplorationPanelProps = {
 
 export function ExplorationPanel({
   preset,
-  pointCount,
   onPrevious,
   onNext,
   onBack,
@@ -22,9 +21,6 @@ export function ExplorationPanel({
       tabIndex={-1}
       aria-live="polite"
     >
-      <p className="exploration-kicker">
-        {preset.index} / {String(pointCount).padStart(2, "0")}
-      </p>
       <p className="exploration-label">{preset.label}</p>
       <h2 className="exploration-title">{preset.title}</h2>
       <p className="exploration-copy">{preset.description}</p>

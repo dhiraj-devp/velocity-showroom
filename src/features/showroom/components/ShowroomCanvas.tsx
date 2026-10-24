@@ -15,6 +15,7 @@ import {
   getShowroomQuality,
 } from "@/features/showroom/config";
 import { useReducedMotion } from "@/features/showroom/hooks/useReducedMotion";
+import { useShowroomPlaying } from "@/features/showroom/components/ShowroomViewport";
 
 type CanvasStatus = "booting" | "ready" | "unsupported";
 
@@ -52,6 +53,7 @@ function getServerViewportWidth() {
 
 export function ShowroomCanvas() {
   const reducedMotion = useReducedMotion();
+  const playing = useShowroomPlaying();
   const width = useSyncExternalStore(
     subscribeResize,
     getViewportWidth,
@@ -80,11 +82,11 @@ export function ShowroomCanvas() {
   return (
     <CanvasErrorBoundary>
       <Canvas
-        className="absolute inset-0 h-full w-full touch-none"
+        className="absolute inset-0 h-full w-full"
         style={{ background: SHOWROOM_BACKGROUND }}
         dpr={[quality.dpr[0], quality.dpr[1]]}
         shadows={false}
-        frameloop={reducedMotion ? "demand" : "always"}
+        frameloop={playing && !reducedMotion ? "always" : "demand"}
         gl={{
           antialias: true,
           alpha: false,

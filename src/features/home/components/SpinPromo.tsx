@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { MagneticButton } from "@/components/common/MagneticButton";
+import { MotionReveal } from "@/features/home/motion/MotionReveal";
 import { VehicleImageFrame } from "@/features/vehicles/components/VehicleImageFrame";
 import { formatPrice } from "@/features/vehicles/lib/formatCurrency";
 import { getHeroImage } from "@/features/vehicles/lib/resolveVehicle";
@@ -19,30 +20,32 @@ export function SpinPromo({ record }: SpinPromoProps) {
     <section
       id="spin"
       aria-labelledby="spin-heading"
-      className="home-reveal border-t border-border px-5 py-20 md:px-10 md:py-28 lg:px-14"
+      className="overflow-x-hidden border-t border-border px-5 py-20 md:px-10 md:py-28 lg:px-14"
     >
       <div className="grid gap-10 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:items-center lg:gap-16">
-        <Link
-          href={`/cars/${vehicle.slug}#view-360`}
-          className="block overflow-hidden border border-border"
-          aria-label={`Open 360 view of ${brand.name} ${vehicle.name}`}
-        >
-          <VehicleImageFrame
-            image={hero}
-            brandId={brand.id}
-            brandName={brand.name}
-            vehicleName={vehicle.name}
-            className="aspect-[16/10]"
-          />
-        </Link>
+        <MotionReveal variant="left">
+          <Link
+            href={`/cars/${vehicle.slug}#view-360`}
+            className="block overflow-hidden border border-border"
+            aria-label={`Open 360 view of ${brand.name} ${vehicle.name}`}
+          >
+            <VehicleImageFrame
+              image={hero}
+              brandId={brand.id}
+              brandName={brand.name}
+              vehicleName={vehicle.name}
+              className="aspect-[16/10]"
+            />
+          </Link>
+        </MotionReveal>
 
-        <div>
+        <MotionReveal variant="right" delay={80}>
           <p className="text-[0.7rem] tracking-[0.42em] text-accent uppercase">
             360° photography
           </p>
           <h2
             id="spin-heading"
-            className="font-display mt-5 text-4xl tracking-[-0.03em] sm:text-5xl lg:text-6xl"
+            className="font-display mt-5 text-[clamp(2.2rem,6vw,3.8rem)] tracking-[-0.03em] lg:text-6xl"
           >
             Walk around the machine.
           </h2>
@@ -58,7 +61,7 @@ export function SpinPromo({ record }: SpinPromoProps) {
               Open 360° view
             </MagneticButton>
           </div>
-        </div>
+        </MotionReveal>
       </div>
     </section>
   );

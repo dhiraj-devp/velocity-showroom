@@ -18,6 +18,7 @@ type VehicleImageFrameProps = {
   vehicleName: string;
   className?: string;
   priority?: boolean;
+  showCaption?: boolean;
 };
 
 export function VehicleImageFrame({
@@ -27,6 +28,7 @@ export function VehicleImageFrame({
   vehicleName,
   className,
   priority,
+  showCaption = true,
 }: VehicleImageFrameProps) {
   const tone = TONES[brandId] ?? "#161618";
   const photo = image && isStoredVehiclePhoto(image.src) ? image : undefined;
@@ -45,28 +47,36 @@ export function VehicleImageFrame({
           height={photo.height}
           className="absolute inset-0 h-full w-full object-cover"
           fetchPriority={priority ? "high" : undefined}
+          loading={priority ? "eager" : "lazy"}
+          decoding="async"
         />
       ) : null}
       <div
         aria-hidden="true"
-        className="absolute inset-0 opacity-80"
+        className="absolute inset-0"
         style={{
-          background: `radial-gradient(ellipse 70% 55% at 70% 20%, rgba(198,165,106,0.18), transparent 58%),
-            linear-gradient(180deg, transparent 35%, rgba(5,5,6,0.72) 100%)`,
+          background: showCaption
+            ? `radial-gradient(ellipse 70% 55% at 70% 20%, rgba(198,165,106,0.18), transparent 58%),
+            linear-gradient(180deg, transparent 35%, rgba(5,5,6,0.72) 100%)`
+            : `linear-gradient(180deg, transparent 70%, rgba(5,5,6,0.28) 100%)`,
         }}
       />
-      <div
-        aria-hidden="true"
-        className="vehicle-media-grid absolute inset-x-0 bottom-0 h-[58%] opacity-40"
-      />
-      <p className="relative z-10 px-5 pt-5 text-[0.58rem] tracking-[0.32em] text-accent uppercase">
-        {brandName}
-      </p>
-      <div className="relative z-10 flex h-full items-end px-5 pb-5">
-        <p className="font-display text-2xl tracking-[-0.03em] text-foreground/90 sm:text-3xl">
-          {vehicleName}
-        </p>
-      </div>
+      {showCaption ? (
+        <>
+          <div
+            aria-hidden="true"
+            className="vehicle-media-grid absolute inset-x-0 bottom-0 h-[58%] opacity-40"
+          />
+          <p className="relative z-10 px-5 pt-5 text-[0.58rem] tracking-[0.32em] text-accent uppercase">
+            {brandName}
+          </p>
+          <div className="relative z-10 flex h-full items-end px-5 pb-5">
+            <p className="font-display text-2xl tracking-[-0.03em] text-foreground/90 sm:text-3xl">
+              {vehicleName}
+            </p>
+          </div>
+        </>
+      ) : null}
       {image ? (
         <span className="sr-only">{image.alt}</span>
       ) : null}

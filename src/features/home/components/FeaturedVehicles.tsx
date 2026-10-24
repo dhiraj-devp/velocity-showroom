@@ -1,5 +1,6 @@
 import { MagneticButton } from "@/components/common/MagneticButton";
 import { SectionHeading } from "@/components/common/SectionHeading";
+import { MotionReveal } from "@/features/home/motion/MotionReveal";
 import { formatPrice } from "@/features/vehicles/lib/formatCurrency";
 import { getHeroImage } from "@/features/vehicles/lib/resolveVehicle";
 import { isStoredVehiclePhoto } from "@/features/vehicles/lib/vehicleImages";
@@ -7,39 +8,47 @@ import { vehicleRepository } from "@/features/vehicles/repository/vehicleReposit
 import type { VehicleRecord } from "@/features/vehicles/types";
 
 export async function FeaturedVehicles() {
-  const featured = await vehicleRepository.getFeaturedVehicles();
+  let featured: VehicleRecord[] = [];
+  try {
+    featured = await vehicleRepository.getFeaturedVehicles();
+  } catch {
+    featured = [];
+  }
+
+  if (featured.length === 0) return null;
 
   return (
     <section
       id="vehicles"
       aria-labelledby="vehicles-heading"
-      className="home-reveal border-b border-border px-5 pt-10 pb-24 md:px-10 md:pt-12 md:pb-32 lg:px-14 lg:pt-14 lg:pb-40"
+      className="overflow-x-hidden border-b border-border px-5 pt-10 pb-24 md:px-10 md:pt-12 md:pb-32 lg:px-14 lg:pt-14 lg:pb-40"
     >
-      <SectionHeading
-        eyebrow="The Collection"
-        title={<span id="vehicles-heading">Featured machines.</span>}
-        description="Signatures from the house. Presence first. Figures second."
-      />
+      <MotionReveal variant="up">
+        <SectionHeading
+          eyebrow="The Collection"
+          title={<span id="vehicles-heading">Featured machines.</span>}
+          description="Signatures from the house. Presence first. Figures second."
+        />
+      </MotionReveal>
 
       <ul className="mt-16 grid gap-px bg-border lg:mt-20 lg:grid-cols-3">
         {featured.map((record, index) => (
-          <li key={record.vehicle.id} className="bg-background">
-            <FeaturedPanel record={record} index={index + 1} />
-          </li>
+          <MotionReveal
+            key={record.vehicle.id}
+            as="li"
+            variant={index % 2 === 0 ? "left" : "right"}
+            delay={Math.min(index, 4) * 80}
+            className="home-tilt bg-background"
+          >
+            <FeaturedPanel record={record} />
+          </MotionReveal>
         ))}
       </ul>
     </section>
   );
 }
 
-function FeaturedPanel({
-  record,
-  index,
-}: {
-  record: VehicleRecord;
-  index: number;
-}) {
-  const order = String(index).padStart(2, "0");
+function FeaturedPanel({ record }: { record: VehicleRecord }) {
   const { vehicle, brand } = record;
   const hero = getHeroImage(record);
   const photo = hero && isStoredVehiclePhoto(hero.src) ? hero : undefined;
@@ -53,6 +62,8 @@ function FeaturedPanel({
             src={photo.src}
             alt=""
             className="absolute inset-0 h-full w-full object-cover"
+            loading="lazy"
+            decoding="async"
           />
         ) : null}
         <div
@@ -64,10 +75,7 @@ function FeaturedPanel({
         </p>
       </div>
 
-      <p className="text-[0.65rem] tracking-[0.28em] text-accent uppercase">
-        {order}
-      </p>
-      <h3 className="font-display mt-3 text-3xl tracking-[-0.03em] sm:text-4xl">
+      <h3 className="font-display text-3xl tracking-[-0.03em] sm:text-4xl">
         {vehicle.name}
       </h3>
       <p className="mt-2 text-sm text-muted">

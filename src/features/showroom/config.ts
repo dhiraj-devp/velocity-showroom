@@ -23,7 +23,7 @@ export const showroomPalette = {
 export const showroomCopy = {
   brand: "VELOCITY",
   experience: "IMMERSIVE EXPERIENCE",
-  collection: "COLLECTION / 01",
+  collection: "COLLECTION",
   vehicleName: "VELOCITY CONCEPT",
   hintDesktop: "DRAG TO EXPLORE",
   hintMobile: "SWIPE TO EXPLORE",

@@ -1,10 +1,16 @@
 import { CallAction } from "@/features/dealership/components/CallAction";
 import { WhatsAppAction } from "@/features/dealership/components/WhatsAppAction";
+import { dealership as localDealership } from "@/features/dealership/data/dealership";
 import { dealershipRepository } from "@/features/dealership/repository/dealershipRepository";
 import { navLinks } from "@/constants/navigation";
 
 export async function Footer() {
-  const dealership = await dealershipRepository.get();
+  let dealership = localDealership;
+  try {
+    dealership = await dealershipRepository.get();
+  } catch {
+    dealership = localDealership;
+  }
 
   return (
     <footer
@@ -46,7 +52,7 @@ export async function Footer() {
           dealership={dealership}
           message={`Hello, I would like to speak with ${dealership.name}.`}
         />
-        <CallAction dealership={dealership} />
+        <CallAction dealership={dealership}>{dealership.phone}</CallAction>
         <a
           href={`mailto:${dealership.email}`}
           className="text-[0.62rem] tracking-[0.22em] text-muted uppercase transition-colors hover:text-foreground"
@@ -55,9 +61,17 @@ export async function Footer() {
         </a>
       </div>
 
-      <p className="mt-12 text-[0.65rem] tracking-[0.2em] text-muted uppercase">
-        © {new Date().getFullYear()} {dealership.name}. All rights reserved.
-      </p>
+      <div className="mt-12 flex flex-wrap items-center gap-x-8 gap-y-3 text-[0.65rem] tracking-[0.2em] text-muted uppercase">
+        <p>© {new Date().getFullYear()} {dealership.name}. All rights reserved.</p>
+        <a
+          href="https://dvmsoft.com"
+          target="_blank"
+          rel="noreferrer"
+          className="transition-colors hover:text-foreground"
+        >
+          Developed by dvmsoft
+        </a>
+      </div>
     </footer>
   );
 }

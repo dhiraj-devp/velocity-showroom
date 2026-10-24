@@ -9,9 +9,9 @@ type ExplorationNavigationProps = {
 };
 
 const LABELS: Record<ExplorationPoint, string> = {
-  design: "01 DESIGN",
-  wheels: "02 WHEELS",
-  interior: "03 INTERIOR",
+  design: "Design",
+  wheels: "Wheels",
+  interior: "Interior",
 };
 
 export function ExplorationNavigation({

@@ -31,15 +31,12 @@ export function ExperienceSection() {
       />
 
       <ol className="mt-16 grid gap-0 lg:mt-20 lg:grid-cols-3">
-        {experienceItems.map((item, index) => (
+        {experienceItems.map((item) => (
           <li
             key={item.title}
             className="border-t border-border py-10 lg:border-t-0 lg:border-l lg:px-10 lg:py-4 lg:first:border-l-0 lg:first:pl-0"
           >
-            <p className="text-[0.65rem] tracking-[0.28em] text-accent uppercase">
-              {String(index + 1).padStart(2, "0")}
-            </p>
-            <h3 className="font-display mt-6 text-4xl tracking-[-0.04em] sm:text-5xl">
+            <h3 className="font-display text-4xl tracking-[-0.04em] sm:text-5xl">
               {item.title}
             </h3>
             <p className="mt-6 max-w-sm text-base leading-relaxed text-muted">

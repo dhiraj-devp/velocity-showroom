@@ -28,17 +28,20 @@ export function VehicleCard({
           brandName={brand.name}
           vehicleName={vehicle.name}
           className="aspect-[16/10]"
+          showCaption={false}
         />
 
         <div className="flex flex-1 flex-col border-x border-b border-border px-5 py-6">
-          <p className="text-[0.58rem] tracking-[0.32em] text-accent uppercase">
-            {brand.name}
-          </p>
-          <VehicleStatus
-            status={vehicle.availability}
-            alwaysShow={alwaysShowAvailability}
-          />
-          <h3 className="font-display mt-2 text-2xl tracking-[-0.03em]">
+          <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+            <p className="text-[0.58rem] tracking-[0.32em] text-accent uppercase">
+              {brand.name}
+            </p>
+            <VehicleStatus
+              status={vehicle.availability}
+              alwaysShow={alwaysShowAvailability}
+            />
+          </div>
+          <h3 className="font-display mt-3 text-2xl tracking-[-0.03em]">
             {vehicle.name}
           </h3>
           <p className="mt-3 text-[0.72rem] tracking-[0.16em] text-muted uppercase">

@@ -10,7 +10,7 @@ export const ENTRY_EXIT_MS = 820;
 export const entryCopy = {
   brand: "VELOCITY",
   collection: "PRIVATE COLLECTION",
-  edition: "2026 / 01",
+  edition: "2026",
   action: "ENTER THE COLLECTION",
 } as const;
 
